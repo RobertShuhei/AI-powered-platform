@@ -20,6 +20,8 @@ services:
     container_name: ai-tour-guide-backend-dev
     env_file:
       - ./backend/.env
+    environment:      
+      - PYTHONPATH=/app
     ports:
       - "5000:5000"
     volumes:

@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
+from sqlalchemy.orm import relationship
 
 
 class User(db.Model):
@@ -23,6 +24,9 @@ class User(db.Model):
     
     # Timestamp for user creation
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # One-to-one guide profile (if the user is a guide)
+    guide = relationship('Guide', uselist=False, back_populates='user')
     
     def set_password(self, password):
         """

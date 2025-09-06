@@ -33,11 +33,15 @@ def create_app():
     # Register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    from app.routes.profile import profile_bp
+    from app.routes.guides import guides_bp
     # from app.routes.users import users_bp
     # from app.routes.tours import tours_bp
     
     app.register_blueprint(main_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(profile_bp, url_prefix='/api')
+    app.register_blueprint(guides_bp, url_prefix='/api')
     # app.register_blueprint(users_bp, url_prefix='/api/users')
     # app.register_blueprint(tours_bp, url_prefix='/api/tours')
     
