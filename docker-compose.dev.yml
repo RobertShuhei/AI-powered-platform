@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ai-tour-guide-db-dev
+    environment:
+      POSTGRES_DB: ai_tour_guide_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ai-tour-guide-dev-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ai-tour-guide-backend-dev
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    networks:
+      - ai-tour-guide-dev-network
+    command: flask --app run run --host=0.0.0.0 --port=5000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ai-tour-guide-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - ai-tour-guide-dev-network
+    command: npm run dev
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  ai-tour-guide-dev-network:
+    driver: bridge

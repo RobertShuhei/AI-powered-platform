@@ -1,0 +1,17 @@
+# Stage 1: 共通のベースイメージ
+FROM python:3.11-slim AS base
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
+
+# Stage 2: 依存関係のインストール
+FROM base AS deps
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 3: 開発用サーバーの実行
+FROM deps AS dev
+# USERやEXPOSEはこちらに移動
+USER root
+EXPOSE 5000
