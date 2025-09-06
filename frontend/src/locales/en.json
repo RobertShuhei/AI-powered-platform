@@ -1,0 +1,15 @@
+{
+  "homepage": {
+    "search_title": "Find Your Perfect Guide",
+    "destination_placeholder": "Where do you want to go?",
+    "dates_placeholder": "Add dates",
+    "travelers_placeholder": "Add travelers",
+    "search_button": "Search",
+    "featured_guides_title": "Featured Guides"
+  },
+  "navigation": {
+    "sign_in": "Sign In",
+    "create_account": "Create your account"
+  }
+}
+

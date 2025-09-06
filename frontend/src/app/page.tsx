@@ -1,6 +1,60 @@
+"use client";
+
 import Link from 'next/link';
+import { useEffect, useState, FormEvent } from 'react';
+import { useI18n } from '@/lib/i18n';
+
+interface Guide {
+  id: string;
+  email?: string;
+  created_at?: string;
+  name_romanized?: string;
+  bio?: string;
+  specialties?: string;
+  rating?: number;
+  languages?: string;
+  areas?: string;
+  price_range?: string;
+}
 
 export default function Home() {
+  const { t } = useI18n();
+  const [destination, setDestination] = useState('');
+  const [dates, setDates] = useState('');
+  const [travelers, setTravelers] = useState<number | ''>('');
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchGuides = async (opts?: { destination?: string }) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const params = new URLSearchParams();
+      if (opts?.destination) {
+        params.set('areas', opts.destination);
+      }
+      const url = `http://localhost:5000/api/guides${params.toString() ? `?${params.toString()}` : ''}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      const data: Guide[] = await res.json();
+      setGuides(data);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load guides');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGuides();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await fetchGuides({ destination });
+  };
   return (
     <main className="min-h-screen bg-cream-50">
       {/* Header */}
@@ -25,7 +79,7 @@ export default function Home() {
 
           <div className="flex items-center space-x-4">
             <Link href="/login" className="bg-terracotta-500 text-cream-50 px-6 py-2.5 rounded-full font-semibold hover:bg-terracotta-600 transition-all duration-200 shadow-md hover:shadow-lg">
-              Sign In
+              {t('navigation.sign_in')}
             </Link>
             <button className="md:hidden p-2 text-charcoal-700">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,45 +106,77 @@ export default function Home() {
 
           {/* Search Bar */}
           <div className="max-w-4xl mx-auto mb-12">
-            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-warm-200/50">
+            <form onSubmit={handleSearchSubmit} className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-warm-200/50">
               <div className="grid sm:grid-cols-3 gap-4 mb-6">
                 <div className="relative">
-                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">Where to?</label>
+                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">{t('homepage.destination_placeholder')}</label>
                   <div className="relative">
                     <svg className="absolute left-3 top-3 w-5 h-5 text-charcoal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <input type="text" placeholder="Enter destination" className="w-full pl-10 pr-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors"/>
+                    <input
+                      type="text"
+                      placeholder={t('homepage.destination_placeholder')}
+                      className="w-full pl-10 pr-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors"
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="relative">
-                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">When?</label>
+                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">{t('homepage.dates_placeholder')}</label>
                   <div className="relative">
                     <svg className="absolute left-3 top-3 w-5 h-5 text-charcoal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <input type="text" placeholder="Select dates" className="w-full pl-10 pr-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors"/>
+                    <input
+                      type="text"
+                      placeholder={t('homepage.dates_placeholder')}
+                      className="w-full pl-10 pr-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors"
+                      value={dates}
+                      onChange={(e) => setDates(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="relative">
-                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">Travelers</label>
-                  <div className="relative">
-                    <svg className="absolute left-3 top-3 w-5 h-5 text-charcoal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                    </svg>
-                    <select className="w-full pl-10 pr-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors appearance-none bg-white">
-                      <option>1 Traveler</option>
-                      <option>2 Travelers</option>
-                      <option>3+ Travelers</option>
-                    </select>
-                  </div>
+                  <label className="block text-sm font-semibold text-charcoal-700 mb-2">{t('homepage.travelers_placeholder')}</label>
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder={t('homepage.travelers_placeholder')}
+                    className="w-full px-4 py-3 border border-warm-300 rounded-xl focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 transition-colors"
+                    value={travelers}
+                    onChange={(e) => setTravelers(e.target.value === '' ? '' : Number(e.target.value))}
+                  />
                 </div>
               </div>
-              <button className="w-full bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-cream-50 px-8 py-4 rounded-xl font-semibold text-lg hover:from-terracotta-600 hover:to-terracotta-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                Find Your Perfect Guide
-              </button>
-            </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-charcoal-600">Tip: Try cities like Tokyo, Barcelona, or Marrakech</p>
+                <button
+                  type="submit"
+                  className="bg-terracotta-500 text-cream-50 px-6 py-3 rounded-xl font-semibold hover:bg-terracotta-600 transition-all duration-200 shadow-md hover:shadow-lg inline-flex items-center"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                      </svg>
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      {t('homepage.search_button')}
+                      <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
 
           {/* Quick Actions */}
@@ -102,6 +188,60 @@ export default function Home() {
               Become a Guide
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Search Results */}
+      <section className="px-4 sm:px-6 py-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-baseline justify-between mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-charcoal-900">{t('homepage.featured_guides_title')}</h2>
+            {guides?.length > 0 && (
+              <span className="text-charcoal-600 text-sm">{guides.length} guides found</span>
+            )}
+          </div>
+          {error && (
+            <div className="mb-6 p-4 rounded-xl border border-warm-300 bg-warm-50 text-charcoal-800">
+              Failed to load guides: {error}
+            </div>
+          )}
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <svg className="animate-spin h-6 w-6 text-terracotta-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <span className="ml-3 text-charcoal-700">Loading guides...</span>
+            </div>
+          )}
+          {!loading && !error && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {guides.map((g) => (
+                <div key={g.id} className="bg-white rounded-2xl shadow-soft border border-warm-200/60 overflow-hidden">
+                  <div className="h-28 bg-gradient-to-r from-terracotta-500/20 to-sage-500/20" />
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-bold text-charcoal-900">{g.name_romanized || 'Guide'}</h3>
+                      <div className="flex items-center text-warm-600 font-semibold">
+                        <svg className="w-4 h-4 mr-1 text-warm-500" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        {g.rating?.toFixed(1) ?? '—'}
+                      </div>
+                    </div>
+                    <p className="text-sm text-charcoal-600 mb-3 max-h-16 overflow-hidden">{g.bio || 'No bio provided.'}</p>
+                    <div className="text-sm text-charcoal-700 mb-4">
+                      <span className="font-semibold">Areas:</span> {g.areas || '—'}
+                    </div>
+                    <Link href={`/guides/${g.id}`} className="text-terracotta-600 font-semibold hover:text-terracotta-700">View Profile →</Link>
+                  </div>
+                </div>
+              ))}
+              {guides.length === 0 && !loading && !error && (
+                <div className="col-span-full text-center text-charcoal-600">No guides found. Try a different destination.</div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 

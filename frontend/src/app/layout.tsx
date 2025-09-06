@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Poppins, Open_Sans } from 'next/font/google'
 import './globals.css'
+import Providers from './providers'
 
 const poppins = Poppins({ 
   subsets: ['latin'],
@@ -82,7 +83,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased scroll-smooth bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900">
         <div id="root" className="relative">
-          {children}
+          <Providers>
+            {children}
+          </Providers>
         </div>
       </body>
     </html>

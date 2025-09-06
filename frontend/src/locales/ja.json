@@ -1,0 +1,14 @@
+{
+  "homepage": {
+    "search_title": "ぴったりのガイドを見つけよう",
+    "destination_placeholder": "どこに行きますか？",
+    "dates_placeholder": "日付を追加",
+    "travelers_placeholder": "人数を追加",
+    "search_button": "検索",
+    "featured_guides_title": "おすすめのガイド"
+  },
+  "navigation": {
+    "sign_in": "サインイン",
+    "create_account": "アカウントを作成"
+  }
+}

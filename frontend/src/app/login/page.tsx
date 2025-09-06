@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n';
 
 interface LoginFormData {
   email: string;
@@ -9,6 +10,7 @@ interface LoginFormData {
 }
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -261,12 +263,12 @@ export default function LoginPage() {
 
               {/* Sign Up Link */}
               <div className="text-center">
-                <a href="#" className="inline-flex items-center justify-center w-full py-3 px-6 border-2 border-sage-500 text-sage-600 font-semibold rounded-xl hover:bg-sage-50 hover:border-sage-600 transition-all duration-200 group">
-                  Create Your Account
+                <Link href="/register" className="inline-flex items-center justify-center w-full py-3 px-6 border-2 border-sage-500 text-sage-600 font-semibold rounded-xl hover:bg-sage-50 hover:border-sage-600 transition-all duration-200 group">
+                  {t('navigation.create_account')}
                   <svg className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </form>
           </div>
